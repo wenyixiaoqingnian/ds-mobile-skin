@@ -1,0 +1,340 @@
+--- /tmp/preview/token-viewer-client.js.bak	2026-08-29 19:40:40.550743772 +0800
++++ client.js	2026-08-30 17:35:07.198282302 +0800
+@@ -261,7 +261,7 @@
+ 			"byProject": "按项目",
+ 			"byConversation": "按对话",
+ 			"close": "关闭",
+-			"ungrouped": "未分组",
++			"ungrouped": "已归档",
+ 			"cost": "估算费用",
+ 			"realUsage": "真实消耗",
+ 			"realTotal": "真实消耗 Tokens",
+@@ -604,6 +604,65 @@
+ 			"kimi-k3-1": {
+ 				offPeak: { inputPerM: 20, outputPerM: 100, cacheReadPerM: 2, cacheWritePerM: 25 },
+ 				peak: { inputPerM: 20, outputPerM: 100, cacheReadPerM: 2, cacheWritePerM: 25 }
++			},
++			// DeepSeek V4-Flash vision-exp — 视觉版 V4-Flash，与 Flash 同价。
++			"deepseek-v4-flash-vision-exp": {
++				offPeak: { inputPerM: 1.5, outputPerM: 4.5, cacheReadPerM: 0.05, cacheWritePerM: 1.5 },
++				peak: { inputPerM: 3, outputPerM: 9, cacheReadPerM: 0.1, cacheWritePerM: 3 }
++			},
++			// MiMo-V2.5 系列 — 小米 (2026-05 永久降价后). 估算值，可按需改。
++			"mimo-v2.5": {
++				offPeak: { inputPerM: 0.4, outputPerM: 1.4, cacheReadPerM: 0.05, cacheWritePerM: 0.4 },
++				peak: { inputPerM: 0.4, outputPerM: 1.4, cacheReadPerM: 0.05, cacheWritePerM: 0.4 }
++			},
++			"mimo-v2.5-pro": {
++				offPeak: { inputPerM: 1, outputPerM: 3, cacheReadPerM: 0.1, cacheWritePerM: 1 },
++				peak: { inputPerM: 1, outputPerM: 3, cacheReadPerM: 0.1, cacheWritePerM: 1 }
++			},
++			"mimo-v2.5-pro-ultraspeed": {
++				offPeak: { inputPerM: 0.9, outputPerM: 2.7, cacheReadPerM: 0.1, cacheWritePerM: 0.9 },
++				peak: { inputPerM: 0.9, outputPerM: 2.7, cacheReadPerM: 0.1, cacheWritePerM: 0.9 }
++			},
++			// ── 主流热门模型 (2026 常用公开价, CNY/1M; 估算值按需改) ──
++			"deepseek-v3.2": {
++				offPeak: { inputPerM: 2, outputPerM: 8, cacheReadPerM: 0.5, cacheWritePerM: 2 },
++				peak: { inputPerM: 2, outputPerM: 8, cacheReadPerM: 0.5, cacheWritePerM: 2 }
++			},
++			"deepseek-r1": {
++				offPeak: { inputPerM: 4, outputPerM: 16, cacheReadPerM: 1, cacheWritePerM: 4 },
++				peak: { inputPerM: 4, outputPerM: 16, cacheReadPerM: 1, cacheWritePerM: 4 }
++			},
++			"qwen3.8-max": {
++				offPeak: { inputPerM: 2.4, outputPerM: 9.6, cacheReadPerM: 0.24, cacheWritePerM: 2.4 },
++				peak: { inputPerM: 2.4, outputPerM: 9.6, cacheReadPerM: 0.24, cacheWritePerM: 2.4 }
++			},
++			"qwen3.7-plus": {
++				offPeak: { inputPerM: 0.8, outputPerM: 2, cacheReadPerM: 0.08, cacheWritePerM: 0.8 },
++				peak: { inputPerM: 0.8, outputPerM: 2, cacheReadPerM: 0.08, cacheWritePerM: 0.8 }
++			},
++			"qwen3.6-flash": {
++				offPeak: { inputPerM: 0.2, outputPerM: 0.6, cacheReadPerM: 0.02, cacheWritePerM: 0.2 },
++				peak: { inputPerM: 0.2, outputPerM: 0.6, cacheReadPerM: 0.02, cacheWritePerM: 0.2 }
++			},
++			"glm-4.6": {
++				offPeak: { inputPerM: 5, outputPerM: 16, cacheReadPerM: 0.5, cacheWritePerM: 5 },
++				peak: { inputPerM: 5, outputPerM: 16, cacheReadPerM: 0.5, cacheWritePerM: 5 }
++			},
++			"glm-4.6-air": {
++				offPeak: { inputPerM: 0.6, outputPerM: 2.5, cacheReadPerM: 0.06, cacheWritePerM: 0.6 },
++				peak: { inputPerM: 0.6, outputPerM: 2.5, cacheReadPerM: 0.06, cacheWritePerM: 0.6 }
++			},
++			"kimi-k2.6": {
++				offPeak: { inputPerM: 7, outputPerM: 29, cacheReadPerM: 1.4, cacheWritePerM: 7 },
++				peak: { inputPerM: 7, outputPerM: 29, cacheReadPerM: 1.4, cacheWritePerM: 7 }
++			},
++			"kimi-k2.5": {
++				offPeak: { inputPerM: 0.8, outputPerM: 4, cacheReadPerM: 0.16, cacheWritePerM: 0.8 },
++				peak: { inputPerM: 0.8, outputPerM: 4, cacheReadPerM: 0.16, cacheWritePerM: 0.8 }
++			},
++			"doubao-seed-2.0-mini": {
++				offPeak: { inputPerM: 0.2, outputPerM: 2, cacheReadPerM: 0.02, cacheWritePerM: 0.2 },
++				peak: { inputPerM: 0.2, outputPerM: 2, cacheReadPerM: 0.02, cacheWritePerM: 0.2 }
+ 			}
+ 		};
+ 		/**
+@@ -758,7 +817,20 @@
+ 						const bk = sessionModels[summary.id];
+ 						if (bk !== void 0) {
+ 							const keys = Object.keys(bk);
+-							if (keys.length === 1) model = keys[0];
++							if (keys.length === 1) {
++								model = keys[0];
++							} else if (keys.length > 1) {
++								// Multi-model session: pick the dominant model
++								// (largest total tokens) for the ledger label.
++								let best = "";
++								let bestTokens = -1;
++								for (const k of keys) {
++									const b = bk[k];
++									const toks = (b ? b.i : 0) + (b ? b.o : 0) + (b ? b.r : 0) + (b ? b.w : 0);
++									if (toks > bestTokens) { bestTokens = toks; best = k; }
++								}
++								model = best;
++							}
+ 						}
+ 					}
+ 					live[summary.id] = {
+@@ -1087,6 +1159,7 @@
+ 						sessionId: record.sessionId,
+ 						sessionTitle: title,
+ 						t: record.t,
++						created: record.t,
+ 						cost: record.cost
+ 					});
+ 				} else {
+@@ -1094,10 +1167,12 @@
+ 						cur.t = record.t;
+ 						cur.sessionId = record.sessionId;
+ 					}
++					if (record.t < cur.created) cur.created = record.t;
+ 					cur.cost += record.cost;
+ 				}
+ 			}
+-			return [...byTitle.values()].sort((a, b) => b.t - a.t);
++			// ds-mobile-skin: rank by cost descending, cap at 10 (daily "today" ranking).
++			return [...byTitle.values()].sort((a, b) => b.cost - a.cost).slice(0, 10);
+ 		}
+ 		/**
+ 		* CC Switch's compact token count: Chinese locale renders 万/亿
+@@ -1210,13 +1285,7 @@
+ 				const occ = view.occupancy;
+ 				push(react_jsx_runtime.jsx("span", {
+ 					className: tokenDockCss.seg,
+-					children: [t("context"), " ", react_jsx_runtime.jsx("strong", { children: occ.percent + "%" }, "v"), react_jsx_runtime.jsx("span", {
+-						className: tokenDockCss.occ,
+-						children: react_jsx_runtime.jsx("span", {
+-							className: tokenDockCss.track,
+-							children: react_jsx_runtime.jsx("span", { className: tokenDockCss.fill, style: { width: occ.percent + "%" } })
+-						})
+-					}, "track")]
++					children: [t("context"), " ", react_jsx_runtime.jsx("strong", { children: occ.percent + "%" }, "v")],
+ 				}, "context"));
+ 			}
+ 			const tooltipLines = [];
+@@ -1289,13 +1358,7 @@
+ 				});
+ 			}
+ 			if (balance.status === "error") {
+-				return react_jsx_runtime.jsx("button", {
+-					type: "button",
+-					className: tokenSidebarCss.balanceError,
+-					onClick: onRefresh,
+-					title: balance.error,
+-					children: [t("balanceUnavailable"), " ", "⟳"]
+-				});
++				return null;
+ 			}
+ 			return null;
+ 		}
+@@ -1353,7 +1416,7 @@
+ 			});
+ 		}
+ 		//#endregion
+-		const detailCss = ".tdd_backdrop{position:fixed;inset:0;background:rgb(0 0 0 / .35);justify-content:flex-end;display:flex;z-index:2147483647;overflow:hidden}.tdd_panel{box-sizing:border-box;position:fixed;top:0;right:0;bottom:0;width:min(600px,94vw);background:var(--dsw-alias-bg-base);border-left:1px solid var(--dsw-alias-border-l1);box-shadow:-12px 0 32px rgb(0 0 0 / .25);flex-direction:column;display:flex;overflow:hidden}.tdd_header{flex:none;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--dsw-alias-border-l1);display:flex}.tdd_headerTitle{color:var(--dsw-alias-label-primary);flex:1;font-size:14px;font-weight:600;line-height:20px}.tdd_close{cursor:pointer;width:28px;height:28px;color:var(--dsw-alias-label-tertiary);background:0 0;border:none;border-radius:50%;flex:none;justify-content:center;align-items:center;padding:0;display:inline-flex}.tdd_close:hover{background:var(--dsw-alias-interactive-bg-hover);color:var(--dsw-alias-label-secondary)}.tdd_body{flex:1;min-height:0;flex-direction:column;gap:14px;padding:12px 14px;display:flex;overflow-y:auto}.tdd_toolbar{flex:none;align-items:center;gap:10px;display:flex}.tdd_toolbarLabel{color:var(--dsw-alias-label-tertiary);font-size:12px;line-height:18px}.tdd_segmented{border:1px solid var(--dsw-alias-border-l2);border-radius:8px;align-items:center;padding:2px;display:inline-flex}.tdd_segment,.tdd_segmentActive{cursor:pointer;border:none;border-radius:6px;padding:3px 10px;font-size:12px;line-height:18px}.tdd_segment{color:var(--dsw-alias-label-tertiary);background:0 0}.tdd_segment:hover{color:var(--dsw-alias-label-secondary)}.tdd_segmentActive{color:var(--dsw-alias-label-primary);background:var(--dsw-alias-interactive-bg-active);font-weight:600}.tdd_hero{flex:none;border:1px solid var(--dsw-alias-border-l1);border-radius:12px;background:var(--dsw-specific-tip);flex-direction:column;gap:10px;padding:12px;display:flex}.tdd_heroTop{align-items:center;justify-content:space-between;gap:12px;display:flex}.tdd_heroMain{min-width:0}.tdd_heroLabel{color:var(--dsw-alias-label-tertiary);font-size:11px;line-height:16px;margin-bottom:2px}.tdd_heroBigRow{align-items:baseline;gap:8px;display:flex}.tdd_heroBig{color:var(--dsw-alias-label-primary);font-size:26px;font-weight:700;font-variant-numeric:tabular-nums;line-height:30px;letter-spacing:-.02em}.tdd_heroChip{color:var(--dsw-alias-label-tertiary);background:var(--dsw-alias-interactive-bg-active);border-radius:6px;font-size:11px;font-weight:500;line-height:16px;padding:1px 6px;flex:none}.tdd_heroSide{align-items:center;gap:10px;border:1px solid var(--dsw-alias-border-l2);border-radius:10px;background:var(--dsw-alias-bg-base);padding:6px 12px;display:flex;flex:none}.tdd_heroSideItem{flex-direction:column;gap:2px;display:flex}.tdd_heroSideLabel{color:var(--dsw-alias-label-caption);font-size:10px;font-weight:500;letter-spacing:.04em;line-height:14px;text-transform:uppercase}.tdd_heroSideValue{color:var(--dsw-alias-label-primary);font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;line-height:18px}.tdd_heroSideValueCost{color:var(--dsw-alias-state-business-primary);font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;line-height:18px}.tdd_heroSideDivider{width:1px;height:26px;background:var(--dsw-alias-border-l2);flex:none}.tdd_heroGrid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.tdd_miniStat{box-sizing:border-box;border:1px solid var(--dsw-alias-border-l2);border-radius:10px;background:var(--dsw-alias-bg-base);flex-direction:column;gap:3px;padding:8px 10px;display:flex;min-width:0}.tdd_miniLabel{color:var(--dsw-alias-label-tertiary);font-size:11px;line-height:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tdd_miniValue{color:var(--dsw-alias-label-primary);font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;line-height:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tdd_hitRate{box-sizing:border-box;border:1px solid var(--dsw-alias-border-l2);border-radius:10px;background:var(--dsw-alias-bg-base);flex-direction:column;justify-content:center;gap:6px;padding:8px 10px;display:flex;min-width:0}.tdd_hitRateTop{align-items:center;justify-content:space-between;gap:6px;display:flex}.tdd_hitRateValue{color:#10b981;font-size:12px;font-weight:700;font-variant-numeric:tabular-nums;line-height:16px}.tdd_hitRateTrack{position:relative;height:6px;border-radius:999px;background:var(--dsw-alias-interactive-bg-active);overflow:hidden}.tdd_hitRateFill{position:absolute;top:0;left:0;bottom:0;border-radius:999px;background:#10b981}.tdd_section{flex:none;flex-direction:column;gap:6px;display:flex}.tdd_sectionTitle{color:var(--dsw-alias-label-tertiary);font-size:11px;line-height:16px;font-weight:600}.tdd_sectionHint{color:var(--dsw-alias-label-caption);font-weight:400}.tdd_legend{flex:none;align-items:center;gap:12px;display:flex;flex-wrap:wrap}.tdd_legendItem{color:var(--dsw-alias-label-caption);align-items:center;gap:4px;font-size:11px;line-height:16px;display:inline-flex}.tdd_legendItem i{width:8px;height:8px;border-radius:2px;flex:none;display:inline-block}.tdd_swatchInput{background:#3b82f6}.tdd_swatchOutput{background:#22c55e}.tdd_swatchCacheWrite{background:#f97316}.tdd_swatchCacheRead{background:#a855f7}.tdd_swatchCost{background:transparent;border:1px dashed #f43f5e}.tdd_chartWrap{position:relative;width:100%;padding-bottom:18px}.tdd_chartSvg{width:100%;height:108px;display:block}.tdd_chartEmpty{height:100px}.tdd_chartGrid{stroke:var(--dsw-alias-border-l2);stroke-dasharray:3 3;opacity:.5}.tdd_areaInput{fill:url(#tvAreaInput)}.tdd_areaOutput{fill:url(#tvAreaOutput)}.tdd_areaCacheWrite{fill:url(#tvAreaCacheWrite)}.tdd_areaCacheRead{fill:url(#tvAreaCacheRead)}.tdd_lineInput{fill:none;stroke:#3b82f6;stroke-width:1.5}.tdd_lineOutput{fill:none;stroke:#22c55e;stroke-width:1.5}.tdd_lineCacheWrite{fill:none;stroke:#f97316;stroke-width:1.5}.tdd_lineCacheRead{fill:none;stroke:#a855f7;stroke-width:1.5}.tdd_lineCost{fill:none;stroke:#f43f5e;stroke-width:1.5;stroke-dasharray:4 4}.tdd_chartHit{fill:transparent}.tdd_chartHit:hover{fill:rgb(0 0 0 / .04)}.tdd_chartLabel{position:absolute;bottom:0;transform:translateX(-50%);color:var(--dsw-alias-label-caption);font-size:10px;line-height:14px;white-space:nowrap}.tdd_tabs{align-items:center;gap:4px;border-bottom:1px solid var(--dsw-alias-border-l1);display:flex}.tdd_tab,.tdd_tabActive{cursor:pointer;border:none;background:0 0;padding:5px 10px;font-size:12px;line-height:18px;border-radius:6px 6px 0 0;border-bottom:2px solid transparent}.tdd_tab{color:var(--dsw-alias-label-tertiary)}.tdd_tab:hover{color:var(--dsw-alias-label-secondary)}.tdd_tabActive{color:var(--dsw-alias-label-primary);font-weight:600;border-bottom-color:var(--dsw-alias-state-business-primary)}.tdd_table{flex-direction:column;display:flex}.tdd_tableHead,.tdd_tableRow,.tdd_logRow{width:100%;align-items:center;gap:8px;padding:5px 6px;font-size:12px;line-height:18px;display:grid;box-sizing:border-box}.tdd_tableHead{color:var(--dsw-alias-label-caption);font-weight:600}.tdd_tableRow{color:var(--dsw-alias-label-secondary)}.tdd_logRow{cursor:pointer;color:var(--dsw-alias-label-secondary);background:0 0;border:none;border-radius:6px;text-align:left}.tdd_logRow:hover{background:var(--dsw-alias-interactive-bg-hover)}.tdd_colTime{flex:none;width:64px;color:var(--dsw-alias-label-caption);white-space:nowrap}.tdd_colProject,.tdd_colSession,.tdd_colModel{min-width:0;flex:1 1 0%;overflow:hidden}.tdd_colProject,.tdd_colSession{text-overflow:ellipsis;white-space:nowrap}.tdd_colModel{white-space:normal;overflow-wrap:break-word;overflow:visible;line-height:15px;font-size:11.5px}.tdd_colNum{flex:none;width:54px;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}.tdd_chartLabelStart{transform:translateX(0)}.tdd_chartLabelEnd{transform:translateX(-100%)}@media (max-width:640px){.tdd_backdrop{position:fixed;top:0;left:0;width:100vw;height:100vh;justify-content:flex-end;display:flex;z-index:2147483647;overflow:hidden}.tdd_panel{position:fixed;top:0;left:0;right:auto;bottom:0;width:100vw;height:100vh;max-width:100vw;border-left:none;box-shadow:none}}";
++		const detailCss = ".tdd_backdrop{position:fixed;inset:0;background:rgb(0 0 0 / .35);justify-content:flex-end;display:flex;z-index:2147483647;overflow:hidden}.tdd_panel{box-sizing:border-box;position:fixed;top:0;right:0;bottom:0;width:min(600px,94vw);background:var(--dsw-alias-bg-base);border-left:1px solid var(--dsw-alias-border-l1);box-shadow:-12px 0 32px rgb(0 0 0 / .25);flex-direction:column;display:flex;overflow:hidden}.tdd_header{flex:none;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--dsw-alias-border-l1);display:flex}.tdd_headerTitle{color:var(--dsw-alias-label-primary);flex:1;font-size:14px;font-weight:600;line-height:20px}.tdd_close{cursor:pointer;width:28px;height:28px;color:var(--dsw-alias-label-tertiary);background:0 0;border:none;border-radius:50%;flex:none;justify-content:center;align-items:center;padding:0;display:inline-flex}.tdd_close:hover{background:var(--dsw-alias-interactive-bg-hover);color:var(--dsw-alias-label-secondary)}.tdd_body{flex:1;min-height:0;flex-direction:column;gap:14px;padding:12px 14px;display:flex;overflow-y:auto}.tdd_toolbar{flex:none;align-items:center;gap:10px;display:flex}.tdd_toolbarLabel{color:var(--dsw-alias-label-tertiary);font-size:12px;line-height:18px}.tdd_segmented{border:1px solid var(--dsw-alias-border-l2);border-radius:8px;align-items:center;padding:2px;display:inline-flex}.tdd_segment,.tdd_segmentActive{cursor:pointer;border:none;border-radius:6px;padding:3px 10px;font-size:12px;line-height:18px}.tdd_segment{color:var(--dsw-alias-label-tertiary);background:0 0}.tdd_segment:hover{color:var(--dsw-alias-label-secondary)}.tdd_segmentActive{color:var(--dsw-alias-label-primary);background:var(--dsw-alias-interactive-bg-active);font-weight:600}.tdd_hero{flex:none;border:1px solid var(--dsw-alias-border-l1);border-radius:12px;background:var(--dsw-specific-tip);flex-direction:column;gap:10px;padding:12px;display:flex}.tdd_heroTop{align-items:center;justify-content:space-between;gap:12px;display:flex}.tdd_heroMain{min-width:0}.tdd_heroLabel{color:var(--dsw-alias-label-tertiary);font-size:11px;line-height:16px;margin-bottom:2px}.tdd_heroBigRow{align-items:baseline;gap:8px;display:flex}.tdd_heroBig{color:var(--dsw-alias-label-primary);font-size:26px;font-weight:700;font-variant-numeric:tabular-nums;line-height:30px;letter-spacing:-.02em}.tdd_heroChip{color:var(--dsw-alias-label-tertiary);background:var(--dsw-alias-interactive-bg-active);border-radius:6px;font-size:11px;font-weight:500;line-height:16px;padding:1px 6px;flex:none}.tdd_heroSide{align-items:center;gap:10px;border:1px solid var(--dsw-alias-border-l2);border-radius:10px;background:var(--dsw-alias-bg-base);padding:6px 12px;display:flex;flex:none}.tdd_heroSideItem{flex-direction:column;gap:2px;display:flex}.tdd_heroSideLabel{color:var(--dsw-alias-label-caption);font-size:10px;font-weight:500;letter-spacing:.04em;line-height:14px;text-transform:uppercase}.tdd_heroSideValue{color:var(--dsw-alias-label-primary);font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;line-height:18px}.tdd_heroSideValueCost{color:var(--dsw-alias-state-business-primary);font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;line-height:18px}.tdd_heroSideDivider{width:1px;height:26px;background:var(--dsw-alias-border-l2);flex:none}.tdd_heroGrid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.tdd_miniStat{box-sizing:border-box;border:1px solid var(--dsw-alias-border-l2);border-radius:10px;background:var(--dsw-alias-bg-base);flex-direction:column;gap:3px;padding:8px 10px;display:flex;min-width:0}.tdd_miniLabel{color:var(--dsw-alias-label-tertiary);font-size:11px;line-height:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tdd_miniValue{color:var(--dsw-alias-label-primary);font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;line-height:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tdd_hitRate{box-sizing:border-box;border:1px solid var(--dsw-alias-border-l2);border-radius:10px;background:var(--dsw-alias-bg-base);flex-direction:column;justify-content:center;gap:6px;padding:8px 10px;display:flex;min-width:0}.tdd_hitRateTop{align-items:center;justify-content:space-between;gap:6px;display:flex}.tdd_hitRateValue{color:#10b981;font-size:12px;font-weight:700;font-variant-numeric:tabular-nums;line-height:16px}.tdd_hitRateTrack{position:relative;height:6px;border-radius:999px;background:var(--dsw-alias-interactive-bg-active);overflow:hidden}.tdd_hitRateFill{position:absolute;top:0;left:0;bottom:0;border-radius:999px;background:#10b981}.tdd_section{flex:none;flex-direction:column;gap:6px;display:flex}.tdd_sectionTitle{color:var(--dsw-alias-label-tertiary);font-size:11px;line-height:16px;font-weight:600}.tdd_sectionHint{color:var(--dsw-alias-label-caption);font-weight:400}.tdd_legend{flex:none;align-items:center;gap:12px;display:flex;flex-wrap:wrap}.tdd_legendItem{color:var(--dsw-alias-label-caption);align-items:center;gap:4px;font-size:11px;line-height:16px;display:inline-flex}.tdd_legendItem i{width:8px;height:8px;border-radius:2px;flex:none;display:inline-block}.tdd_swatchInput{background:#3b82f6}.tdd_swatchOutput{background:#22c55e}.tdd_swatchCacheWrite{background:#f97316}.tdd_swatchCacheRead{background:#a855f7}.tdd_swatchCost{background:transparent;border:1px dashed #f43f5e}.tdd_chartWrap{position:relative;width:100%;padding-bottom:18px}.tdd_chartSvg{width:100%;height:108px;display:block}.tdd_chartEmpty{height:100px}.tdd_chartGrid{stroke:var(--dsw-alias-border-l2);stroke-dasharray:3 3;opacity:.5}.tdd_areaInput{fill:url(#tvAreaInput)}.tdd_areaOutput{fill:url(#tvAreaOutput)}.tdd_areaCacheWrite{fill:url(#tvAreaCacheWrite)}.tdd_areaCacheRead{fill:url(#tvAreaCacheRead)}.tdd_lineInput{fill:none;stroke:#3b82f6;stroke-width:1.5}.tdd_lineOutput{fill:none;stroke:#22c55e;stroke-width:1.5}.tdd_lineCacheWrite{fill:none;stroke:#f97316;stroke-width:1.5}.tdd_lineCacheRead{fill:none;stroke:#a855f7;stroke-width:1.5}.tdd_lineCost{fill:none;stroke:#f43f5e;stroke-width:1.5;stroke-dasharray:4 4}.tdd_chartHit{fill:transparent}.tdd_chartHit:hover{fill:rgb(0 0 0 / .04)}.tdd_chartLabel{position:absolute;bottom:0;transform:translateX(-50%);color:var(--dsw-alias-label-caption);font-size:10px;line-height:14px;white-space:nowrap}.tdd_tabs{align-items:center;gap:4px;border-bottom:1px solid var(--dsw-alias-border-l1);display:flex}.tdd_tab,.tdd_tabActive{cursor:pointer;border:none;background:0 0;padding:5px 10px;font-size:12px;line-height:18px;border-radius:6px 6px 0 0;border-bottom:2px solid transparent}.tdd_tab{color:var(--dsw-alias-label-tertiary)}.tdd_tab:hover{color:var(--dsw-alias-label-secondary)}.tdd_tabActive{color:var(--dsw-alias-label-primary);font-weight:600;border-bottom-color:var(--dsw-alias-state-business-primary)}.tdd_table{flex-direction:column;display:flex}.tdd_tableHead,.tdd_tableRow,.tdd_logRow{width:100%;align-items:center;gap:8px;padding:5px 6px;font-size:12px;line-height:18px;display:grid;box-sizing:border-box}.tdd_tableHead{color:var(--dsw-alias-label-caption);font-weight:600}.tdd_tableRow{color:var(--dsw-alias-label-secondary)}.tdd_logRow{cursor:pointer;color:var(--dsw-alias-label-secondary);background:0 0;border:none;border-radius:6px;text-align:left}.tdd_logRow:hover{background:var(--dsw-alias-interactive-bg-hover)}.tdd_colTime{flex:none;width:64px;color:var(--dsw-alias-label-caption);white-space:nowrap}.tdd_colProject,.tdd_colSession,.tdd_colModel{min-width:0;flex:1 1 0%;overflow:hidden}.tdd_colProject,.tdd_colSession{text-overflow:ellipsis;white-space:nowrap}.tdd_colModel{white-space:normal;overflow-wrap:break-word;overflow:visible;line-height:15px;font-size:11.5px}.tdd_colNum{flex:none;width:54px;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}.tdd_chartLabelStart,.tdd_chartLabelEnd{position:absolute;bottom:0;color:var(--dsw-alias-label-caption);font-size:10px;line-height:14px;white-space:nowrap}.tdd_chartLabelStart{transform:translateX(0)}.tdd_chartLabelEnd{transform:translateX(-100%)}@media (max-width:640px){.tdd_backdrop{position:fixed;top:0;left:0;width:100vw;height:100vh;justify-content:flex-end;display:flex;z-index:2147483647;overflow:hidden}.tdd_panel{position:fixed;top:0;left:0;right:auto;bottom:0;width:100vw;height:100vh;max-width:100vw;border-left:none;box-shadow:none.tdd_heroBig{font-size:20px;line-height:26px;letter-spacing:-.01em;min-width:0}.tdd_heroChip{display:inline-flex;font-size:10px;padding:1px 5px}.tdd_heroGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 10px}.tdd_miniLabel,.tdd_miniValue,.tdd_hitRateValue,.tdd_heroSideLabel,.tdd_heroSideValue,.tdd_heroSideValueCost{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tdd_heroSideItem{min-width:0;flex:1}.tdd_miniValue{font-size:13px}.tdd_miniStat{padding:8px 10px;gap:2px}.tdd_chartLabelStart,.tdd_chartLabelEnd{font-size:8px;line-height:12px}.tdd_colNum{width:60px}.tdd_colTime{width:54px}.tdd_tableHead,.tdd_tableRow,.tdd_logRow{font-size:11.5px;padding:4px 4px;gap:6px}.tdd_colSession{font-size:12px}.tdd_heroLabel{font-size:10px;line-height:14px}.tdd_heroSide{justify-self:stretch;justify-content:space-between;width:100%;box-sizing:border-box;padding:8px 8px;gap:6px}.tdd_chartLabel{font-size:8px;line-height:12px}.tdd_heroSideLabel{letter-spacing:0;font-size:9px;line-height:13px;text-transform:none}.tdd_colModel{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}";
+ 		const detailTagId = "dsh-token-viewer/TokenDetailPanel.module.css";
+ 		if (typeof document !== "undefined" && document.querySelector("style[data-plugin-css=" + JSON.stringify(detailTagId) + "]") === null) {
+ 			const tag = document.createElement("style");
+@@ -1458,6 +1521,12 @@
+ 			const sameDay = d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth() && d.getDate() === now.getDate();
+ 			return sameDay ? hhmm : pad(d.getMonth() + 1) + "/" + pad(d.getDate()) + " " + hhmm;
+ 		}
++		/** ds-mobile-skin: creation-date-only label (MM/DD) for the log rows. */
++		function dateLabel(ts) {
++			const d = new Date(ts);
++			const pad = (n) => String(n).padStart(2, "0");
++			return pad(d.getMonth() + 1) + "/" + pad(d.getDate());
++		}
+ 		/** One hero mini-stat card. */
+ 		function MiniStat({ label, value, accent }) {
+ 			return react_jsx_runtime.jsx("div", {
+@@ -1535,7 +1604,7 @@
+ 										+ " · " + t("output") + " " + bucket.output.toLocaleString()
+ 										+ " · " + t("cacheWrite") + " " + bucket.cacheWrite.toLocaleString()
+ 										+ " · " + t("cacheRead") + " " + bucket.cacheRead.toLocaleString()
+-										+ " · " + t("totalCost") + " " + formatCostExact(bucket.cost, 4)
++										+ " · " + t("totalCost") + " " + formatCostExact(bucket.cost, 2)
+ 										+ " · " + t("requests") + " " + bucket.requests
+ 								})
+ 							}, "h" + bucket.t))
+@@ -1587,12 +1656,11 @@
+ 				if (typeof document === "undefined") return;
+ 				const node = backdropRef.current;
+ 				if (node === null) return;
+-				// Move the backdrop to <body> so position:fixed is anchored to
+-				// the viewport regardless of dsh's AppFrame / mobile-fix layout.
+-				document.body.appendChild(node);
+-				return () => {
+-					if (node.parentNode === document.body) document.body.removeChild(node);
+-				};
++				// ds-mobile-skin patch: do NOT move the backdrop to <body>. The raw
++				// appendChild breaks React's event delegation (React root is #root)
++				// AND makes React's unmount removeChild throw NotFoundError, so the
++				// panel's buttons stop working and it cannot be closed. Keeping the
++				// node in the React tree restores both.
+ 			}, [open]);
+ 			if (!open) return null;
+ 			const close = () => { actions.setOpen(false); };
+@@ -1653,37 +1721,37 @@
+ 															className: tokenDetailCss.heroBigRow,
+ 															children: [
+ 																react_jsx_runtime.jsx("span", { className: tokenDetailCss.heroBig, title: summary.realTotal.toLocaleString(), children: summary.realTotal.toLocaleString() }, "big"),
+-																react_jsx_runtime.jsx("span", { className: tokenDetailCss.heroChip, children: "≈ " + formatTokensShort(summary.realTotal, isZh, 2) }, "chip")
++																react_jsx_runtime.jsx("span", { className: tokenDetailCss.heroChip, children: "≈ " + (summary.realTotal / 1e8).toFixed(2) + "亿" }, "chip")
+ 															]
+ 														}, "row")
+ 													]
+-												}, "main"),
+-												react_jsx_runtime.jsx("div", {
+-													className: tokenDetailCss.heroSide,
+-													children: [
+-														react_jsx_runtime.jsx("div", {
+-															className: tokenDetailCss.heroSideItem,
+-															children: [
+-																react_jsx_runtime.jsx("span", { className: tokenDetailCss.heroSideLabel, children: t("requests") }, "a"),
+-																react_jsx_runtime.jsx("span", { className: tokenDetailCss.heroSideValue, children: summary.requests.toLocaleString() }, "b")
+-															]
+-														}, "req"),
+-														react_jsx_runtime.jsx("div", { className: tokenDetailCss.heroSideDivider }, "div"),
+-														react_jsx_runtime.jsx("div", {
+-															className: tokenDetailCss.heroSideItem,
+-															children: [
+-																react_jsx_runtime.jsx("span", { className: tokenDetailCss.heroSideLabel, children: t("totalCost") }, "a"),
+-																react_jsx_runtime.jsx("span", { className: tokenDetailCss.heroSideValueCost, children: formatCostExact(summary.cost, 4) }, "b")
+-															]
+-														}, "cost")
+-													]
+-												}, "side")
++												}, "main")
+ 											]
+ 										}, "top"),
+ 										react_jsx_runtime.jsx("div", {
+ 											className: tokenDetailCss.heroGrid,
+ 											children: [
+ 												react_jsx_runtime.jsx(MiniStat, { label: t("freshInput"), value: formatTokensShort(summary.input, isZh), accent: "#3b82f6" }, "in"),
++																								react_jsx_runtime.jsx("div", {
++												className: tokenDetailCss.heroSide,
++												children: [
++												react_jsx_runtime.jsx("div", {
++												className: tokenDetailCss.heroSideItem,
++												children: [
++												react_jsx_runtime.jsx("span", { className: tokenDetailCss.heroSideLabel, children: t("requests") }, "a"),
++												react_jsx_runtime.jsx("span", { className: tokenDetailCss.heroSideValue, children: summary.requests.toLocaleString() }, "b")
++												]
++												}, "req"),
++												react_jsx_runtime.jsx("div", { className: tokenDetailCss.heroSideDivider }, "div"),
++												react_jsx_runtime.jsx("div", {
++												className: tokenDetailCss.heroSideItem,
++												children: [
++												react_jsx_runtime.jsx("span", { className: tokenDetailCss.heroSideLabel, children: t("totalCost") }, "a"),
++												react_jsx_runtime.jsx("span", { className: tokenDetailCss.heroSideValueCost, children: formatCostExact(summary.cost, 2) }, "b")
++												]
++												}, "cost")
++												]
++												}, "side"),
+ 												react_jsx_runtime.jsx(MiniStat, { label: t("output"), value: formatTokensShort(summary.output, isZh), accent: "#22c55e" }, "out"),
+ 												react_jsx_runtime.jsx(MiniStat, { label: t("cacheWrite"), value: formatTokensShort(summary.cacheWrite, isZh), accent: "#f97316" }, "cw"),
+ 												react_jsx_runtime.jsx(MiniStat, { label: t("cacheRead"), value: formatTokensShort(summary.cacheRead, isZh), accent: "#a855f7" }, "cr"),
+@@ -1766,9 +1834,9 @@
+ 														onClick: () => { openSession(row.sessionId); close(); },
+ 														title: row.sessionTitle,
+ 														children: [
+-															react_jsx_runtime.jsx("span", { className: tokenDetailCss.colTime, children: clockLabel(row.t) }, "c1"),
++															react_jsx_runtime.jsx("span", { className: tokenDetailCss.colTime, children: dateLabel(row.created) }, "c1"),
+ 															react_jsx_runtime.jsx("span", { className: tokenDetailCss.colSession, children: row.sessionTitle }, "c2"),
+-															react_jsx_runtime.jsx("span", { className: tokenDetailCss.colNum, children: formatCostExact(row.cost, 4) }, "c7")
++															react_jsx_runtime.jsx("span", { className: tokenDetailCss.colNum, children: formatCostExact(row.cost, 2) }, "c7")
+ 														]
+ 													}, row.sessionId + ":" + row.t + ":" + index))
+ 											]
+@@ -1795,7 +1863,7 @@
+ 															react_jsx_runtime.jsx("span", { className: tokenDetailCss.colProject, title: row.title, children: row.title === "ungrouped" ? t("ungrouped") : row.title }, "c1"),
+ 															react_jsx_runtime.jsx("span", { className: tokenDetailCss.colNum, children: row.requests.toLocaleString() }, "c2"),
+ 															react_jsx_runtime.jsx("span", { className: tokenDetailCss.colNum, children: (row.input + row.output).toLocaleString() }, "c3"),
+-															react_jsx_runtime.jsx("span", { className: tokenDetailCss.colNum, children: formatCostExact(row.cost, 4) }, "c4")
++															react_jsx_runtime.jsx("span", { className: tokenDetailCss.colNum, children: formatCostExact(row.cost, 2) }, "c4")
+ 														]
+ 													}, row.id))
+ 											]
+@@ -1823,8 +1891,8 @@
+ 															react_jsx_runtime.jsx("span", { className: tokenDetailCss.colModel, title: row.model, children: row.model }, "c1"),
+ 															react_jsx_runtime.jsx("span", { className: tokenDetailCss.colNum, children: row.requests.toLocaleString() }, "c2"),
+ 															react_jsx_runtime.jsx("span", { className: tokenDetailCss.colNum, children: row.totalTokens.toLocaleString() }, "c3"),
+-															react_jsx_runtime.jsx("span", { className: tokenDetailCss.colNum, children: formatCostExact(row.cost, 4) }, "c4"),
+-															react_jsx_runtime.jsx("span", { className: tokenDetailCss.colNum, children: formatCostExact(row.avgCost, 6) }, "c5")
++															react_jsx_runtime.jsx("span", { className: tokenDetailCss.colNum, children: formatCostExact(row.cost, 2) }, "c4"),
++															react_jsx_runtime.jsx("span", { className: tokenDetailCss.colNum, children: formatCostExact(row.avgCost, 2) }, "c5")
+ 														]
+ 													}, row.model))
+ 											]
+@@ -1853,24 +1921,23 @@
+ 			const ledger = useUsageLedger(byId, sessionModels);
+ 			// Totals = live sessions + deleted conversations retained in the ledger,
+ 			// so removing a conversation does not shrink the reported tokens/cost.
++			// Totals = TODAY's records only (resets at local midnight) instead of
++			// cumulative per-session byId. New day → no records → all zero.
+ 			const totals = (0, react.useMemo)(() => {
+-				const live = deriveSidebarTotals(byId);
+-				const liveIds = new Set(Object.keys(byId));
+-				let u = 0, r = 0, w = 0, o = 0, n = 0;
+-				for (const id of Object.keys(ledger)) {
+-					if (liveIds.has(id)) continue;
+-					const led = ledger[id];
+-					if (led === void 0) continue;
+-					u += led.i || 0; r += led.r || 0; w += led.w || 0; o += led.o || 0; n += 1;
+-				}
++				const deletedLedger = {};
++				const live = new Set(Object.keys(byId));
++				for (const id of Object.keys(ledger)) if (!live.has(id)) deletedLedger[id] = ledger[id];
++				const todayRecords = collectRequestRecords(byId, "today", Date.now(), sessionModels, deletedLedger, t("deletedConversation"));
++				const u = usageSummary(todayRecords);
++				const sessions = new Set(todayRecords.map((r) => r.sessionId)).size;
+ 				return {
+-					uncached: live.uncached + u,
+-					cacheRead: live.cacheRead + r,
+-					cacheWrite: live.cacheWrite + w,
+-					output: live.output + o,
+-					sessions: live.sessions + n,
++					uncached: u.input,
++					cacheRead: u.cacheRead,
++					cacheWrite: u.cacheWrite,
++					output: u.output,
++					sessions
+ 				};
+-			}, [byId, ledger]);
++			}, [byId, ledger, sessionModels, t]);
+ 			const perSession = (0, react.useMemo)(() => derivePerSession(byId), [byId]);
+ 			const todayCost = (0, react.useMemo)(() => {
+ 				const deletedLedger = {};
+@@ -1911,7 +1978,7 @@
+ 							react_jsx_runtime.jsx("span", { className: tokenSidebarCss.seg, children: [t("input"), " ", react_jsx_runtime.jsx("strong", { children: formatTokens(input) }, "v")] }, "in"),
+ 							react_jsx_runtime.jsx("span", { className: tokenSidebarCss.seg, children: [t("output"), " ", react_jsx_runtime.jsx("strong", { children: formatTokens(totals.output) }, "v")] }, "out"),
+ 							cacheHit !== null && react_jsx_runtime.jsx("span", { className: tokenSidebarCss.seg, children: [t("cacheHit"), " ", react_jsx_runtime.jsx("strong", { children: cacheHit + "%" }, "v")] }, "hit"),
+-							todayCost > 0 && react_jsx_runtime.jsx("span", { className: tokenSidebarCss.seg, children: [t("todaySpend"), " ", react_jsx_runtime.jsx("strong", { children: formatCostExact(todayCost, 4) }, "v")] }, "today")
++							todayCost > 0 && react_jsx_runtime.jsx("span", { className: tokenSidebarCss.seg, children: [t("todaySpend"), " ", react_jsx_runtime.jsx("strong", { children: formatCostExact(todayCost, 2) }, "v")] }, "today")
+ 						]
+ 					}, "line")
+ 				]
