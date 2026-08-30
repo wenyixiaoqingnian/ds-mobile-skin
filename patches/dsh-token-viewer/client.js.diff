@@ -1,5 +1,5 @@
---- /tmp/preview/token-viewer-client.js.bak	2026-08-29 19:40:40.550743772 +0800
-+++ client.js	2026-08-30 17:35:07.198282302 +0800
+--- a/dsh-token-viewer/lib/client.js
++++ b/dsh-token-viewer/lib/client.js
 @@ -261,7 +261,7 @@
  			"byProject": "按项目",
  			"byConversation": "按对话",
