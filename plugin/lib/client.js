@@ -325,7 +325,15 @@ window.__ModuleLoader__.load({
       applySnap(b);
     }
 
-    function syncMenuVisibility() { document.body.classList.toggle('ds-drawer-open', sidebarOpen()); }
+    function syncMenuVisibility() {
+      var open = sidebarOpen();
+      document.body.classList.toggle('ds-drawer-open', open);
+      /* Defensive: if the CSS rule ever fails (e.g. dark mode override or a
+         competing selector wins), force-hide the button ourselves so it can
+         never intercept pointer events behind the drawer. */
+      var btn = document.querySelector('.ds-deepseek-menu');
+      if (btn) btn.style.setProperty('display', open ? 'none' : 'grid', 'important');
+    }
 
     function ensureUploadButton() {
       if (!mobileOnly()) return;
@@ -363,8 +371,12 @@ window.__ModuleLoader__.load({
       }
     }
 
-    /* Anchor any button popup (menu / listbox / dialog) above its trigger button
-       instead of letting the mobile-fix center them on screen. */
+    /* Anchor small button popovers (menu / listbox) above their trigger instead
+       of letting the mobile-fix center them on screen. We DO NOT touch
+       [role="dialog"]: dialogs are sheets / side panels / archive overlays /
+       confirmations that the product positions on its own. Resizing/relocating
+       a full-height archive sheet with this rule pinned it to the top of the
+       viewport and rendered it non-interactive (rect 0x0 / clipped). */
     var lastPopupTrigger = null;
     function onButtonPointerDown(e) {
       if (!mobileOnly()) return;
@@ -373,16 +385,14 @@ window.__ModuleLoader__.load({
     }
     function positionOpenPopup() {
       if (!mobileOnly()) return;
-      var popup = document.querySelector('[role="menu"], [role="listbox"], [role="dialog"]');
+      var popup = document.querySelector('[role="menu"], [role="listbox"]');
       if (!popup) return;   /* don't clobber lastPopupTrigger here — it may be set
                                 just before the popup mounts; a stale trigger is
                                 only ever overwritten by a new button pointerdown */
       if (!lastPopupTrigger || !lastPopupTrigger.isConnected) return;
       var vw = window.innerWidth, vh = window.innerHeight;
-      /* Skip naturally full-screen panels (e.g. the Token Usage detail panel,
-         which the product renders as a full-screen slide-over on mobile) — those
-         must NOT be squeezed into a card above the button. Only small popovers
-         (menus / listboxes / compact dialogs) get anchored above their button. */
+      /* Skip naturally full-screen panels (e.g. menu/listbox wrapped by a sheet
+         wrapper) — they must NOT be squeezed into a card above the button. */
       if (popup.offsetWidth >= vw * 0.9 && popup.offsetHeight >= vh * 0.9) return;
       var br = lastPopupTrigger.getBoundingClientRect();
       var avail = Math.max(140, vh - br.top - 16);   /* bounded height above button */
