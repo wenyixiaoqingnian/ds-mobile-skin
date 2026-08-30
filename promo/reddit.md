@@ -15,8 +15,6 @@ I run DSH (DeepSeek Harness) on my server and access it from my phone. The stock
 Bonus: a small unified-diff patch for `dsh-token-viewer` that adds a "today" billing panel (resets at local midnight), 2-decimal cost formatting, sorted request log, and proper mobile layout. Includes a one-liner `apply-patch.sh` that backs up, applies, and verifies.
 
 ![mobile home](https://raw.githubusercontent.com/wenyixiaoqingnian/ds-mobile-skin/main/docs/screenshot-mobile-home.png)
-![drawer](https://raw.githubusercontent.com/wenyixiaoqingnian/ds-mobile-skin/main/docs/screenshot-mobile-drawer.png)
-![archive](https://raw.githubusercontent.com/wenyixiaoqingnian/ds-mobile-skin/main/docs/screenshot-mobile-archive.png)
 
 **Install:**
 ```bash
