@@ -14,11 +14,12 @@
 
 ## 📱 预览
 
-| 主页（带悬浮菜单球 + 底部 composer） | 会话抽屉 | 归档面板 |
-|:---:|:---:|:---:|
-| ![home](docs/screenshot-mobile-home.png) | ![drawer](docs/screenshot-mobile-drawer.png) | ![archive](docs/screenshot-mobile-archive.png) |
+**主页**（带 ☰ 悬浮菜单球 + 底部 composer + 品牌蓝 #4D6BFE）：
+
+![home](docs/screenshot-mobile-home.png)
 
 > 纯前端（浏览器侧）改动，**不触碰**任何聊天会话、模型配置、密钥等数据。
+> 截图仅展示 UI 风格，不含真实数据。
 
 ---
 
