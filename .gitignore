@@ -1,0 +1,21 @@
+# dependencies
+node_modules/
+.pnpm-store/
+
+# build artifacts
+dist/
+*.tgz
+*.zip
+
+# local profile state — never commit these
+profiles/
+.dsh/
+
+# editor / OS
+.DS_Store
+*.swp
+.idea/
+.vscode/
+
+# patch backups
+*.bak-*
