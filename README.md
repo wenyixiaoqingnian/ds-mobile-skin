@@ -59,7 +59,7 @@ pnpm install
 
 **硬刷新浏览器**（Ctrl/Cmd+Shift+R）即可生效 —— 客户端代码每次请求都从磁盘读取，无需重启服务。
 
-> ⚠️ **插件包名必须保持 `ds-mobile-skin`**。部分部署环境的 `dsh-profile-guard` 会按名删除特定插件（旧名 `dsh-web-deepseek-mobile`），改名即可绕过该名单。
+> ⚠️ **插件包名必须保持 `ds-mobile-skin`**，以便环境识别、卸载与升级（请勿改名为其他包名后安装）。
 
 ### 2. 应用计费补丁（可选）
 
@@ -104,11 +104,36 @@ ds-mobile-skin/
 
 ## 🛠 开发
 
-硬刷新浏览器即可看到效果（服务端每次请求都重新读取 `client.js`）。重新生成补丁：
+硬刷新浏览器即可看到效果（服务端每次请求都重新读取 `client.js`）。重新生成补丁（用 `--label` 避免把本机路径写进 diff）：
 
 ```bash
-diff -u <原始 client.js> <当前 client.js> > patches/dsh-token-viewer/client.js.diff
+diff -u --label a/dsh-token-viewer/lib/client.js --label b/dsh-token-viewer/lib/client.js \
+  <原始 client.js> <当前 client.js> > patches/dsh-token-viewer/client.js.diff
 ```
+
+生成后跑一次校验器确认 hunk 头行数与正文一致：
+
+```bash
+python3 .github/scripts/validate-diff.py
+```
+
+---
+
+## ⚠️ 已知限制与兼容性
+
+- **CSS 类名依赖**：皮肤层针对产品构建产物的 CSS Modules hash（如 `.hHd-Xa_root`、`.pI_x6G_frame`）编写，上游**任何一次重新构建都可能换名**，导致部分样式失效（表现为皮肤半生效）。已验证范围见插件 `package.json` 的版本记录；升级 DSH 后如发现错乱，先确认 hash 是否变化。
+- **补丁版本绑定**：`patches/dsh-token-viewer/client.js.diff` 针对 `dsh-token-viewer@0.2.0` 生成。`apply-patch.sh` 会读取已装版本并**拒绝**不匹配的版本，避免静默损坏。升级该插件后请重新生成 diff。
+- **只影响手机视口**：所有覆盖都在 `@media (max-width: 768px)` 内，桌面端不受影响。
+
+## 🧯 Troubleshooting
+
+| 现象 | 处理 |
+|---|---|
+| 刷新后无变化 | 硬刷新（Ctrl/Cmd+Shift+R）；确认插件在 profile bundles 中：`dsh plugin ls --profile web` |
+| 皮肤半生效/错乱 | 见上「已知限制」——检查 hash 类名是否仍存在（DevTools 搜 `.hHd-Xa_root`） |
+| 补丁应用失败 | 先看报错：版本不匹配就装对应版本；行号漂移就重新生成 diff |
+| 想回滚补丁 | 脚本每次应用前生成 `client.js.bak-<时间戳>`（保留最近 3 个），恢复：`cp client.js.bak-<时间戳> client.js` |
+| 想卸载插件 | `dsh plugin --profile web remove ds-mobile-skin` 后硬刷新 |
 
 ---
 
