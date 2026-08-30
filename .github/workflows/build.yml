@@ -22,25 +22,35 @@ jobs:
           test -f lib/client.js && test -f lib/index.js && test -f cordis.patch.yml
 
       - name: Pack plugin tarball
-        working-directory: plugin
-        run: npm pack --pack-destination ../dist
+        run: |
+          mkdir -p dist
+          # npm pack writes the tarball to CWD; move it to the repo-root dist/ dir
+          ( cd plugin && npm pack )
+          mv plugin/ds-mobile-skin-*.tgz dist/
+          ls -la dist/
 
       - name: Validate patch applies cleanly
         run: |
-          sudo apt-get update -qq && sudo apt-get install -y -qq patch >/dev/null
-          # fetch a pristine dsh-token-viewer client.js from npm
-          npm pack dsh-token-viewer --pack-destination /tmp >/dev/null 2>&1 || true
-          # if the package is unavailable in CI, just verify the diff is well-formed
-          if ls /tmp/dsh-token-viewer-*.tgz >/dev/null 2>&1; then
-            tar -xzf /tmp/dsh-token-viewer-*.tgz -C /tmp
-            ./patches/dsh-token-viewer/apply-patch.sh /tmp/package/lib/client.js
+          # If we can fetch a pristine copy from npm, try the apply end-to-end;
+          # otherwise just sanity-check the diff is parseable by `patch`.
+          if command -v apt-get >/dev/null; then
+            sudo apt-get update -qq && sudo apt-get install -y -qq patch >/dev/null
+          fi
+          set +e
+          npm pack dsh-token-viewer --pack-destination /tmp >/dev/null 2>&1
+          TARBALL=$(ls /tmp/dsh-token-viewer-*.tgz 2>/dev/null | head -1)
+          set -e
+          if [ -n "$TARBALL" ]; then
+            tar -xzf "$TARBALL" -C /tmp
+            bash patches/dsh-token-viewer/apply-patch.sh /tmp/package/lib/client.js
             grep -q "ds-mobile-skin: rank by cost descending" /tmp/package/lib/client.js
           else
-            patch --dry-run -p1 /dev/null < patches/dsh-token-viewer/client.js.diff >/dev/null 2>&1 || \
-            echo "WARN: dsh-token-viewer not published to npm; skipping apply test"
+            echo "WARN: dsh-token-viewer not published to npm; only validating diff syntax"
+            patch --dry-run -p1 -i patches/dsh-token-viewer/client.js.diff -o /tmp/patched.js >/dev/null < /dev/null
           fi
 
       - name: Upload artifacts
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: ds-mobile-skin
