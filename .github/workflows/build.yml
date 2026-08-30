@@ -31,11 +31,9 @@ jobs:
 
       - name: Validate patch applies cleanly
         run: |
+          # GitHub runners ship git and patch; no apt install needed.
           # If we can fetch a pristine copy from npm, try the apply end-to-end;
           # otherwise just sanity-check the diff is well-formed.
-          if command -v apt-get >/dev/null; then
-            sudo apt-get update -qq && sudo apt-get install -y -qq patch >/dev/null
-          fi
           set +e
           npm pack dsh-token-viewer --pack-destination /tmp >/dev/null 2>&1
           TARBALL=$(ls /tmp/dsh-token-viewer-*.tgz 2>/dev/null | head -1)
